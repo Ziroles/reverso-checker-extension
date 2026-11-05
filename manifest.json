@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Reverso Checker (non officiel)",
+  "version": "0.1.0",
+  "description": "Correcteur d'orthographe et de grammaire dans les champs de texte, propulsé par le correcteur en ligne de Reverso. Non affilié à Reverso.",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": ["https://orthographe.reverso.net/*"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_title": "Reverso Checker",
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" }
+  },
+  "options_page": "options.html",
+  "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" }
+}

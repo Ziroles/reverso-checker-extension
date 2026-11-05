@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Reverso Checker : options</title>
+<style>
+  :root { color-scheme: light dark; --accent: #2b6cb0; --line: rgba(128,128,128,.28); --mut: rgba(128,128,128,.95); }
+  * { box-sizing: border-box; }
+  body { max-width: 600px; margin: 0 auto; padding: 28px 16px 48px; font: 14px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  header img { width: 36px; height: 36px; border-radius: 9px; }
+  h1 { font-size: 20px; margin: 0; }
+  .lead { color: var(--mut); font-size: 13px; margin: 0 0 20px; }
+  section { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--mut); margin: 0 0 10px; }
+  label.field { display: block; font-weight: 600; margin: 12px 0 4px; }
+  label.field small, .hint { font-weight: 400; color: var(--mut); }
+  label.check { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  textarea, select, input[type=number] { width: 100%; font: inherit; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: inherit; }
+  textarea { height: 110px; resize: vertical; }
+  button { font: inherit; font-weight: 600; padding: 8px 18px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer; }
+  button:hover { filter: brightness(1.1); }
+  #saved { color: #1a7f37; margin-left: 10px; opacity: 0; transition: opacity .2s; }
+  #saved.on { opacity: 1; }
+  #debug { height: 200px; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; }
+</style>
+</head>
+<body>
+  <header>
+    <img src="icons/48.png" alt="">
+    <h1>Reverso Checker</h1>
+  </header>
+  <p class="lead">Extension non officielle. Le texte tapé dans les champs surveillés est envoyé aux serveurs de Reverso pour être corrigé.</p>
+
+  <section>
+    <h2>Général</h2>
+    <label class="check"><input type="checkbox" id="enabled"> Activer la correction</label>
+
+    <label class="field" for="language">Langue</label>
+    <select id="language">
+      <option value="auto">Détection automatique (français par défaut)</option>
+      <option value="fra">Français</option>
+      <option value="eng">English</option>
+    </select>
+
+    <label class="field" for="debounce">Délai avant vérification <small>(ms, plus long = moins de requêtes)</small></label>
+    <input type="number" id="debounce" min="300" max="5000" step="100">
+  </section>
+
+  <section>
+    <h2>Listes</h2>
+    <label class="field" for="dictionary" style="margin-top:0">Dictionnaire personnel <small>(un mot par ligne)</small></label>
+    <textarea id="dictionary"></textarea>
+
+    <label class="field" for="sites">Sites désactivés <small>(un domaine par ligne, ex. docs.example.com)</small></label>
+    <textarea id="sites"></textarea>
+  </section>
+
+  <p><button id="save">Enregistrer</button><span id="saved">Enregistré</span></p>
+
+  <section>
+    <h2>Diagnostic</h2>
+    <p class="hint" style="margin-top:0">Dernière réponse reçue de Reverso et statistiques de cache (utile si une faute n'est pas détectée).</p>
+    <textarea id="debug" readonly></textarea>
+  </section>
+
+  <script src="options.js"></script>
+</body>
+</html>

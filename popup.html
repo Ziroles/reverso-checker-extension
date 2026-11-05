@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+  :root { color-scheme: light dark; --accent: #2b6cb0; --line: rgba(128,128,128,.25); --mut: rgba(128,128,128,.95); }
+  * { box-sizing: border-box; }
+  body { width: 280px; margin: 0; font: 13px/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  header { display: flex; align-items: center; gap: 10px; padding: 14px 16px 10px; }
+  header img { width: 28px; height: 28px; border-radius: 7px; }
+  header strong { display: block; font-size: 14px; }
+  header small { color: var(--mut); }
+  main { padding: 0 16px 8px; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; border-top: 1px solid var(--line); }
+  .row small { display: block; color: var(--mut); font-size: 11.5px; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sw { position: relative; flex: none; width: 36px; height: 20px; }
+  .sw input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
+  .sw i { position: absolute; inset: 0; border-radius: 999px; background: rgba(128,128,128,.4); transition: background .15s; }
+  .sw i::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+  .sw input:checked + i { background: var(--accent); }
+  .sw input:checked + i::after { transform: translateX(16px); }
+  .sw input:disabled + i { opacity: .4; }
+  .seg { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button { font: inherit; font-size: 12px; padding: 4px 9px; border: 0; background: none; color: inherit; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button.on { background: var(--accent); color: #fff; }
+  footer { padding: 8px 16px 14px; border-top: 1px solid var(--line); }
+  a { color: var(--accent); font-size: 12px; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+  <header>
+    <img src="icons/48.png" alt="">
+    <div><strong>Reverso Checker</strong><small>Correcteur non officiel</small></div>
+  </header>
+  <main>
+    <div class="row"><div>Correction activée</div>
+      <label class="sw"><input type="checkbox" id="enabled"><i></i></label></div>
+    <div class="row"><div>Sur ce site<small id="host"></small></div>
+      <label class="sw"><input type="checkbox" id="site"><i></i></label></div>
+    <div class="row"><div>Langue</div>
+      <div class="seg" id="language">
+        <button data-lang="auto">Auto</button>
+        <button data-lang="fra">FR</button>
+        <button data-lang="eng">EN</button>
+      </div></div>
+  </main>
+  <footer><a href="#" id="opts">Dictionnaire et options</a></footer>
+  <script src="popup.js"></script>
+</body>
+</html>
