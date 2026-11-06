@@ -66,14 +66,17 @@ Les lettres sont lues par position physique de touche (`KeyboardEvent.code`) : `
 
 **Popup** (icône de l'extension dans la barre d'outils) :
 - activer ou désactiver la correction partout ;
-- la couper pour le site courant ;
+- choisir le comportement **par défaut** :
+  - **Actif** : correction partout, sauf sur les sites exclus (liste noire) ;
+  - **Inactif** : correction nulle part, sauf sur les sites autorisés (liste blanche) ;
+- activer ou couper le site courant (ajoute ou retire le site de la liste du mode choisi) ;
 - choisir la langue : Auto, FR ou EN.
 
 **Page d'options** (lien « Dictionnaire et options » dans la popup) :
 - langue par défaut (la détection automatique choisit le français en cas de doute) ;
 - délai avant vérification, de 300 à 5000 ms (plus long = moins de requêtes) ;
 - dictionnaire personnel, un mot par ligne ;
-- sites désactivés, un domaine par ligne ;
+- mode par défaut et listes de sites, un domaine par ligne. `example.com` vise ce domaine exact, `*.example.com` vise aussi ses sous-domaines. Les deux listes sont conservées quand on change de mode ;
 - diagnostic : dernière réponse brute de Reverso et statistiques du cache.
 
 Les réglages sont stockés dans `chrome.storage.sync` et suivent le compte du navigateur.
@@ -89,6 +92,49 @@ Les réglages sont stockés dans `chrome.storage.sync` et suivent le compte du n
   4. en dernier recours, la faute est sélectionnée et la correction copiée : faire `Ctrl+V`.
 
 Champs ignorés : mots de passe, e-mail, téléphone, adresse, codes à usage unique, champs en lecture seule et champs marqués `spellcheck="false"`.
+
+## Google Docs
+
+Google Docs dessine le texte dans un `<canvas>` : le correcteur des champs ordinaires n'y voit rien. Les documents Google Docs passent donc par un chemin à part :
+
+- **lecture et correction par l'API Google Docs** officielle (`documents.get`, `documents.batchUpdate`), après connexion à votre compte Google ;
+- **panneau latéral** : liste des fautes avec leur contexte, suggestions, « Tout corriger », filtre par catégorie, « Ignorer », « Ajouter au dictionnaire » ;
+- **soulignements dans la page**, par-dessus le canvas. Cliquer sur un soulignement ouvre une carte de correction.
+
+Les soulignements reposent sur un hack : `gdocs-main.js` demande à Docs son mode « canvas annoté » (texte doublé en SVG) en se faisant passer pour une extension que Google autorise. Ce mode peut disparaître à tout moment. Dans ce cas, seuls les soulignements manquent : le panneau continue de fonctionner. Pour vérifier qu'il est actif, dans la console de la page Docs : `document.querySelectorAll('rect[aria-label]').length` doit être supérieur à 0.
+
+Fonctionne uniquement avec **Chrome** : `chrome.identity.getAuthToken` n'existe pas dans Edge ni Brave.
+
+### Configuration (une fois, environ 10 minutes)
+
+1. Charger l'extension (voir [Installation](#installation)), puis copier son **ID** affiché dans `chrome://extensions`.
+2. Sur <https://console.cloud.google.com>, créer un projet.
+3. **API et services > Bibliothèque** : activer **Google Docs API**.
+4. **Écran de consentement OAuth** (Google Auth Platform) :
+   - type **Externe**, nom de l'application et e-mail au choix ;
+   - **Audience > Utilisateurs test** : ajouter votre propre adresse Gmail ;
+   - **Accès aux données** : ajouter le scope `https://www.googleapis.com/auth/documents`.
+5. **Identifiants > Créer des identifiants > ID client OAuth** :
+   - type d'application **Extension Chrome** ;
+   - **ID de l'article** : l'ID copié à l'étape 1.
+6. Copier l'ID client (`….apps.googleusercontent.com`) dans `manifest.json`, champ `oauth2.client_id`, à la place de `REMPLACER_PAR_VOTRE_CLIENT_ID.apps.googleusercontent.com`.
+7. Recharger l'extension (⟳) et la page Docs.
+
+L'ID d'une extension non empaquetée dépend du chemin du dossier : si vous déplacez le dossier, l'ID change et il faut refaire l'étape 5.
+
+### Utilisation
+
+1. Ouvrir un document, cliquer sur l'icône de l'extension, puis sur **Panneau**.
+2. Première fois : **Se connecter et vérifier**, puis accepter l'accès à vos documents. Google affiche un avertissement « application non validée » : c'est normal pour un projet en mode test, cliquer sur **Continuer**.
+3. Ensuite, la vérification se relance seule quelques secondes après la fin de la frappe : l'extension interroge la révision du document toutes les 5 s et ne revérifie que si elle a changé.
+
+Fonctionnement :
+
+- Le document est découpé en lots de 6000 caractères, envoyés à Reverso à la suite. Le cache par phrase évite de renvoyer le texte inchangé : sur un gros document, seule la première vérification est longue. Sur HTTP 429, l'extension attend puis réessaie.
+- Avant chaque correction, le document est relu. La faute est retrouvée à sa position ou, si le texte a bougé, par son contexte. La modification est envoyée avec `requiredRevisionId` : si quelqu'un modifie le document au même moment, elle est refusée puis retentée une fois.
+- Seul le corps de l'onglet affiché (`?tab=`) est vérifié. En-têtes, pieds de page, notes de bas de page et tables des matières sont ignorés.
+- Une faute qui contient une image ou un saut de paragraphe est signalée mais pas corrigée automatiquement.
+- Le scope `documents` donne à l'extension un accès en lecture et en écriture à tous vos Google Docs. Le jeton reste dans Chrome et ne sert qu'aux appels vers `docs.googleapis.com`. Le texte du document part chez Reverso, comme pour les autres champs.
 
 ## Fonctionnement
 
@@ -111,6 +157,11 @@ recale les fautes à la frappe   ◀─réponse─── n'envoie que les phrase
 |----------------|-------------------------------------------------------------|
 | `manifest.json`| Déclaration MV3, permissions                                |
 | `background.js`| Appels API, découpage, cache, file d'attente                |
+| `common.js`    | Réglages par défaut, règles de sites, langue (partagé)      |
+| `gdocs-bg.js`  | Google Docs : OAuth, API Docs, vérification, corrections    |
+| `gdocs-main.js`| Google Docs : active le canvas annoté (monde de la page)    |
+| `gdocs.js`     | Google Docs : soulignements et carte dans la page           |
+| `sidepanel.*`  | Panneau latéral Google Docs                                 |
 | `content.js`   | Détection des champs, soulignement, carte, liste, raccourcis|
 | `content.css`  | Couleurs des soulignements `contenteditable`                |
 | `popup.*`      | Popup de la barre d'outils                                  |
@@ -126,7 +177,7 @@ node -e "const b = require('./background.js'); console.log(b.splitChunks('Bonjou
 
 | Problème | Piste |
 |----------|-------|
-| Rien n'est souligné | Recharger la page après l'installation ou la mise à jour. Vérifier que le site n'est pas désactivé dans la popup. |
+| Rien n'est souligné | Recharger la page après l'installation ou la mise à jour. Vérifier dans la popup que le site est actif (en mode « Inactif par défaut », il doit être dans la liste blanche). |
 | Pastille `!` jaune | Survoler pour lire l'erreur. « Trop de requêtes » : l'extension fait une pause puis réessaie seule. « Extension rechargée » : recharger la page. |
 | Une faute n'est pas détectée | Options, section Diagnostic : voir ce que Reverso a renvoyé. |
 | La correction ne s'applique pas | Le site bloque la modification. La correction est copiée dans le presse-papiers : `Ctrl+V`. |

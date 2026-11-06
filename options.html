@@ -52,8 +52,22 @@
     <label class="field" for="dictionary" style="margin-top:0">Dictionnaire personnel <small>(un mot par ligne)</small></label>
     <textarea id="dictionary"></textarea>
 
-    <label class="field" for="sites">Sites désactivés <small>(un domaine par ligne, ex. docs.example.com)</small></label>
-    <textarea id="sites"></textarea>
+  </section>
+
+  <section>
+    <h2>Sites</h2>
+    <label class="check"><input type="radio" name="mode" value="blacklist"> Actif partout, sauf les sites exclus</label>
+    <label class="check" style="margin-top:6px"><input type="radio" name="mode" value="whitelist"> Inactif partout, sauf les sites autorisés</label>
+    <p class="hint">Un domaine par ligne. <code>example.com</code> vise ce domaine exact, <code>*.example.com</code> vise aussi ses sous-domaines.</p>
+
+    <div id="blWrap">
+      <label class="field" for="sites">Sites exclus</label>
+      <textarea id="sites"></textarea>
+    </div>
+    <div id="wlWrap">
+      <label class="field" for="wsites">Sites autorisés</label>
+      <textarea id="wsites"></textarea>
+    </div>
   </section>
 
   <p><button id="save">Enregistrer</button><span id="saved">Enregistré</span></p>
@@ -64,6 +78,7 @@
     <textarea id="debug" readonly></textarea>
   </section>
 
+  <script src="common.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

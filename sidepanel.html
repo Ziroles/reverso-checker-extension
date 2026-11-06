@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Reverso Checker : Google Docs</title>
+<style>
+  :root { color-scheme: light dark; --accent: #2b6cb0; --line: rgba(128,128,128,.25); --mut: rgba(128,128,128,.95); --hover: rgba(128,128,128,.12); }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 13px/1.45 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  header { display: flex; align-items: center; gap: 10px; padding: 12px 14px 8px; }
+  header img { width: 24px; height: 24px; border-radius: 6px; }
+  header div { min-width: 0; }
+  header strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #status { color: var(--mut); font-size: 12px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 14px 10px; border-bottom: 1px solid var(--line); }
+  button { font: inherit; cursor: pointer; }
+  .btn { padding: 5px 12px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font-weight: 600; }
+  .btn.green { background: #1a7f37; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .cat { padding: 3px 10px; border-radius: 999px; font-size: 12px; color: var(--c);
+    border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); background: color-mix(in srgb, var(--c) 10%, transparent); }
+  #list { padding: 6px; }
+  .item { border-radius: 8px; padding: 8px; }
+  .item:hover { background: var(--hover); }
+  .head { display: flex; align-items: center; gap: 8px; }
+  .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+  s { color: #cf222e; } b { color: #1a7f37; }
+  @media (prefers-color-scheme: dark) { s { color: #ff7b72; } b { color: #57d36d; } }
+  .ctx { margin: 4px 0 0 16px; color: var(--mut); font-size: 12px; word-break: break-word; }
+  .ctx mark { background: color-mix(in srgb, var(--c) 25%, transparent); color: inherit; border-radius: 3px; }
+  .acts { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0 16px; }
+  .sug { padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); background: none; color: inherit; }
+  .sug.main { background: var(--c); border-color: var(--c); color: #fff; font-weight: 600; }
+  .link { background: none; border: 0; padding: 2px 0; color: var(--mut); font-size: 12px; }
+  .link:hover { color: var(--accent); text-decoration: underline; }
+  details { margin: 4px 0 0 16px; color: var(--mut); font-size: 12px; }
+  .empty { padding: 24px 16px; color: var(--mut); text-align: center; }
+  .err { margin: 10px 14px; padding: 8px 10px; border-radius: 8px; background: color-mix(in srgb, #bf8700 15%, transparent); }
+</style>
+</head>
+<body>
+  <header>
+    <img src="icons/48.png" alt="">
+    <div><strong id="title">Google Docs</strong><span id="status"></span></div>
+  </header>
+  <div class="bar" id="bar"></div>
+  <div id="msg"></div>
+  <div id="list"></div>
+  <script src="common.js"></script>
+  <script src="sidepanel.js"></script>
+</body>
+</html>

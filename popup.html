@@ -24,6 +24,8 @@
   .seg button { font: inherit; font-size: 12px; padding: 4px 9px; border: 0; background: none; color: inherit; cursor: pointer; }
   .seg button + button { border-left: 1px solid var(--line); }
   .seg button.on { background: var(--accent); color: #fff; }
+  .open { font: inherit; font-size: 12px; font-weight: 600; padding: 4px 10px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer; }
+  [hidden] { display: none !important; }
   footer { padding: 8px 16px 14px; border-top: 1px solid var(--line); }
   a { color: var(--accent); font-size: 12px; text-decoration: none; }
   a:hover { text-decoration: underline; }
@@ -37,6 +39,11 @@
   <main>
     <div class="row"><div>Correction activée</div>
       <label class="sw"><input type="checkbox" id="enabled"><i></i></label></div>
+    <div class="row"><div>Par défaut<small id="modeHint"></small></div>
+      <div class="seg" id="mode">
+        <button data-mode="blacklist" title="Actif partout, sauf sites exclus">Actif</button>
+        <button data-mode="whitelist" title="Inactif partout, sauf sites autorisés">Inactif</button>
+      </div></div>
     <div class="row"><div>Sur ce site<small id="host"></small></div>
       <label class="sw"><input type="checkbox" id="site"><i></i></label></div>
     <div class="row"><div>Langue</div>
@@ -45,8 +52,11 @@
         <button data-lang="fra">FR</button>
         <button data-lang="eng">EN</button>
       </div></div>
+    <div class="row" id="gdRow" hidden><div>Google Docs<small>Liste des fautes et corrections</small></div>
+      <button class="open" id="gdOpen">Panneau</button></div>
   </main>
   <footer><a href="#" id="opts">Dictionnaire et options</a></footer>
+  <script src="common.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

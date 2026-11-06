@@ -6,7 +6,7 @@
 // - 429 / 5xx : pause exponentielle, le content script réessaie.
 
 const API_URL = 'https://orthographe.reverso.net/api/v1/Spelling';
-const MAX_CACHE = 800; // phrases
+const MAX_CACHE = 5000; // phrases (un gros Google Doc en compte des milliers)
 const MAX_RUN = 3000; // caractères par requête
 const MAX_PARALLEL = 2;
 
@@ -269,6 +269,9 @@ if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage)
     return true; // réponse asynchrone
   });
 }
+
+// Google Docs (API Docs + panneau latéral)
+if (typeof importScripts === 'function') importScripts('common.js', 'gdocs-bg.js');
 
 if (typeof module !== 'undefined') {
   module.exports = { check, splitChunks, normalizeRange, mapCorrections };

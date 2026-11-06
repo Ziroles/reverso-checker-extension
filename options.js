@@ -1,6 +1,15 @@
-const DEFAULTS = { enabled: true, language: 'auto', debounce: 900, disabledSites: [], dictionary: [] };
+const DEFAULTS = RVC.DEFAULTS;
 const $ = (id) => document.getElementById(id);
 const lines = (s) => [...new Set(s.split('\n').map((x) => x.trim()).filter(Boolean))];
+const siteLines = (s) => [...new Set(s.split('\n').map(RVC.normalizeSite).filter(Boolean))];
+const mode = () => (document.querySelector('input[name=mode]:checked') || {}).value || 'blacklist';
+
+function showMode() {
+  // les deux listes sont gardées ; seule celle du mode choisi est affichée
+  $('blWrap').hidden = mode() !== 'blacklist';
+  $('wlWrap').hidden = mode() !== 'whitelist';
+}
+for (const r of document.querySelectorAll('input[name=mode]')) r.addEventListener('change', showMode);
 
 chrome.storage.sync.get(DEFAULTS, (s) => {
   $('enabled').checked = s.enabled;
@@ -8,6 +17,9 @@ chrome.storage.sync.get(DEFAULTS, (s) => {
   $('debounce').value = s.debounce;
   $('dictionary').value = s.dictionary.join('\n');
   $('sites').value = s.disabledSites.join('\n');
+  $('wsites').value = s.enabledSites.join('\n');
+  document.querySelector('input[name=mode][value=' + s.siteMode + ']').checked = true;
+  showMode();
 });
 
 $('save').addEventListener('click', () => {
@@ -18,10 +30,16 @@ $('save').addEventListener('click', () => {
       language: $('language').value,
       debounce,
       dictionary: lines($('dictionary').value),
-      disabledSites: lines($('sites').value.toLowerCase())
+      siteMode: mode(),
+      disabledSites: siteLines($('sites').value),
+      enabledSites: siteLines($('wsites').value)
     },
     () => {
       $('debounce').value = debounce;
+      chrome.storage.sync.get(DEFAULTS, (s) => {
+        $('sites').value = s.disabledSites.join('\n');
+        $('wsites').value = s.enabledSites.join('\n');
+      });
       $('saved').classList.add('on');
       setTimeout(() => $('saved').classList.remove('on'), 1500);
     }

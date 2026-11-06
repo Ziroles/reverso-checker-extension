@@ -5,7 +5,7 @@
 
   const MAX_CHARS = 10000;
   const NAV_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown']);
-  const DEFAULTS = { enabled: true, language: 'auto', debounce: 900, disabledSites: [], dictionary: [] };
+  const DEFAULTS = RVC.DEFAULTS;
   const CATS = {
     spell: { label: 'Orthographe', color: '#e5484d' },
     gram: { label: 'Grammaire', color: '#2f6feb' },
@@ -29,7 +29,7 @@
   }
 
   function active() {
-    return settings.enabled && !(settings.disabledSites || []).includes(location.hostname);
+    return settings.enabled && RVC.siteActive(settings, location.hostname);
   }
 
   chrome.storage.sync.get(DEFAULTS, (s) => applySettings(s));
@@ -128,26 +128,8 @@
     }
   }
 
-  function pickLanguage(text) {
-    if (settings.language !== 'auto') return settings.language;
-    const words = text.toLowerCase().match(/[a-zàâçéèêëîïôûùüÿœ']+/g) || [];
-    const FR = new Set('le la les un une des et est que qui dans pour pas je tu il elle nous vous ils sur avec ce cette de du au aux mais ou où ne se sont suis ai a en'.split(' '));
-    const EN = new Set('the and is are to of in that it for with as on was be this have not you i but they at by from'.split(' '));
-    let fr = (text.match(/[àâçéèêëîïôûùüÿœ]/gi) || []).length;
-    let en = 0;
-    for (const w of words) {
-      if (FR.has(w)) fr++;
-      if (EN.has(w)) en++;
-    }
-    return en > fr ? 'eng' : 'fra';
-  }
-
-  function catOf(c) {
-    const s = (c.group + ' ' + c.type).toLowerCase();
-    if (/ortho|spell|mot inconnu|accent/.test(s)) return 'spell';
-    if (/ponct|punct|typo|espace/.test(s)) return 'punct';
-    return 'gram';
-  }
+  const pickLanguage = (text) => RVC.pickLanguage(text, settings.language);
+  const catOf = RVC.catOf;
 
   /* ------------------------------------------------------------------ cycle de vie */
 
